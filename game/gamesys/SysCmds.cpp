@@ -31,6 +31,9 @@
 #include "NoGameTypeInfo.h"
 #endif
 
+idPlayer* player = gameLocal.GetLocalPlayer();
+
+
 /*
 ==================
 Cmd_GetFloatArg
@@ -534,6 +537,17 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 	if ( !give_all && !player->Give( name, value ) ) {
 		gameLocal.Printf( "unknown item\n" );
 	}
+}
+
+void GrantArmorOnKill()
+{
+	//TODO: Implement cooldown
+	//TODO: stop negative armor bug
+
+	player = gameLocal.GetLocalPlayer();
+	//player->inventory.armor += 5;
+	player->Give("armor", "5");
+	gameLocal.Printf("Armor Grant end reached");
 }
 
 /*

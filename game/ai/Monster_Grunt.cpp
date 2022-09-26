@@ -3,6 +3,8 @@
 #pragma hdrstop
 
 #include "../Game_local.h"
+#include "../gamesys/SysCmds.h"
+	//
 
 class rvMonsterGrunt : public idAI {
 public:
@@ -196,6 +198,8 @@ rvMonsterGrunt::OnDeath
 */
 void rvMonsterGrunt::OnDeath ( void ) {
 	RageStop ( );
+	GrantArmorOnKill();
+	gameLocal.Printf("Armor Grant on kill function finished");
 	return idAI::OnDeath ( );
 }
 

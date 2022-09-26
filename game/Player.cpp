@@ -10016,18 +10016,22 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
 			armorSave = inventory.armor;
 		}
 
- 		if ( !damage ) {
- 			armorSave = 0;
- 		} else if ( armorSave >= damage ) {
- 			armorSave = damage - 1;
- 			damage = 1;
- 		} else {
- 			damage -= armorSave;
- 		}
+		if (armorSave >= 1)
+		{
+			armorSave = damage;
+			damage = 0;
+		}
+		else if (armorSave < 1)
+		{
+			armorSave = 0;
+			damage = damage;
+		}
+
 	} else {
+		//This branch is inaccessible.
 		armorSave = 0;
 	}
-
+	if (armorSave < 0) armorSave = 0;
  	// check for team damage
  	if ( gameLocal.IsTeamGame()
  		&& !gameLocal.serverInfo.GetBool( "si_teamDamage" )
@@ -10258,12 +10262,20 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 			}
 		}
 
+		//Removing mandated chip damage
 		if ( damage < 1 ) {
-			damage = 1;
+			damage = 0;
 		}
+		
 
 		int oldHealth = health;
 		health -= damage;
+
+		/*
+		Force impulses
+		int itemBuyImpulse = GetItemBuyImpulse("item_armor_small");
+		PerformImpulse(itemBuyImpulse);
+		*/
 
 		GAMELOG_ADD ( va("player%d_damage_taken", entityNumber ), damage );
 		GAMELOG_ADD ( va("player%d_damage_%s", entityNumber, damageDefName), damage );
