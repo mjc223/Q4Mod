@@ -32,7 +32,7 @@
 #endif
 
 idPlayer* player = gameLocal.GetLocalPlayer();
-
+int prevArmorCooldown = 0;
 
 /*
 ==================
@@ -542,12 +542,14 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 void GrantArmorOnKill()
 {
 	//TODO: Implement cooldown
-	//TODO: stop negative armor bug
-
 	player = gameLocal.GetLocalPlayer();
-	//player->inventory.armor += 5;
-	player->Give("armor", "5");
-	gameLocal.Printf("Armor Grant end reached");
+	int temp = gameLocal.time - prevArmorCooldown;
+	if (temp > 5000) //5 second cooldown on the player receiving armor from a kill
+	{
+		prevArmorCooldown = gameLocal.time;
+		player->Give("armor", "5");
+	}
+	//gameLocal.Printf("Armor Grant end reached");
 }
 
 /*

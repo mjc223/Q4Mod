@@ -10031,7 +10031,6 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
 		//This branch is inaccessible.
 		armorSave = 0;
 	}
-	if (armorSave < 0) armorSave = 0;
  	// check for team damage
  	if ( gameLocal.IsTeamGame()
  		&& !gameLocal.serverInfo.GetBool( "si_teamDamage" )
@@ -10043,6 +10042,7 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
  	}
 
 	*health = damage;
+	if (armorSave < 0) armorSave = 0;
 	*armor = armorSave;
 }
 
@@ -10187,6 +10187,7 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 
 	// give feedback on the player view and audibly when armor is helping
 	inventory.armor -= armorSave;
+	if (inventory.armor < 0) inventory.armor = 0;
 
 	if ( g_debugDamage.GetInteger() ) {
 		gameLocal.Printf( "client:%i health:%i damage:%i armor:%i\n", 
@@ -10270,6 +10271,7 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 
 		int oldHealth = health;
 		health -= damage;
+
 
 		/*
 		Force impulses
