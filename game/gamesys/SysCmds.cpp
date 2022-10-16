@@ -552,6 +552,11 @@ void GrantArmorOnKill()
 	//gameLocal.Printf("Armor Grant end reached");
 }
 
+void BeginAssault()
+{
+	
+}
+
 /*
 ==================
 Cmd_Give_f
