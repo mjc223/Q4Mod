@@ -3588,6 +3588,7 @@ idAI::Prethink
 ============
 */
 void idAI::Prethink ( void ) {
+	ReviewAssaultWave();
 	// Update our helper if we are moving
 	if ( move.fl.moving ) {
 		UpdateHelper ( );
@@ -3681,9 +3682,8 @@ void idAI::OnDeath( void ){
 	}
 
 	aiManager.RemoveTeammate ( this );
-
+	GrantArmorOnKill();
 	ExecScriptFunction( funcs.death );
-
 /* DONT DROP ANYTHING FOR NOW
 	float rVal = gameLocal.random.RandomInt( 100 );
 

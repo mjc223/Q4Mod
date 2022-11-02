@@ -198,7 +198,6 @@ rvMonsterGrunt::OnDeath
 */
 void rvMonsterGrunt::OnDeath ( void ) {
 	GrantArmorOnKill();
-	gameLocal.Printf("Armor Grant on kill function finished");
 	RageStop ( );
 	return idAI::OnDeath ( );
 }

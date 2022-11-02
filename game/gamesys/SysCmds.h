@@ -10,4 +10,14 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value );
 
 void GrantArmorOnKill();
 
+void BeginAssaultWave(const idCmdArgs& args);
+
+void ReviewAssaultWave();
+
+void SpawnEnemies(int phase);
+
+void Cmd_EnemySpawn_f(int enemy);
+
+int ReturnEnemyCount();
+
 #endif /* !__SYS_CMDS_H__ */

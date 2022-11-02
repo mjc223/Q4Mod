@@ -33,6 +33,9 @@
 
 idPlayer* player = gameLocal.GetLocalPlayer();
 int prevArmorCooldown = 0;
+int enemyCount = 0;
+int assaultWaveStart = 0;
+bool waveInProgress = false;
 
 /*
 ==================
@@ -549,12 +552,181 @@ void GrantArmorOnKill()
 		prevArmorCooldown = gameLocal.time;
 		player->Give("armor", "5");
 	}
-	//gameLocal.Printf("Armor Grant end reached");
 }
 
-void BeginAssault()
+void BeginAssaultWave(const idCmdArgs& args)
 {
+	assaultWaveStart = gameLocal.time;
+	waveInProgress = true;
+	enemyCount = 0;
+}
+
+int ReturnEnemyCount()
+{
+	return enemyCount;
+}
+
+void ReviewAssaultWave()
+{
+	if (!waveInProgress)
+		return;
+
 	
+	int temp = gameLocal.time - assaultWaveStart;
+	if (temp < 450000)
+	{
+		if (temp % 4000 == 0)
+		{
+			SpawnEnemies(1);
+			enemyCount++;
+			return;
+		}
+	}
+	else if (temp < 195000)
+	{
+		if (temp % 2000 == 0)
+		{
+			SpawnEnemies(2);
+			enemyCount++;
+			return;
+		}
+	}
+	else if (temp >= 215000)
+	{
+		assaultWaveStart = gameLocal.time;
+		return;
+	}
+	else
+		return;
+}
+
+void SpawnEnemies(int phase)
+{
+	int randx = gameLocal.random.RandomInt(100);
+
+	switch (phase) {
+
+	case 1:
+		//Build Assault Wave
+		if (randx < 75) {
+			//Cmd_EnemySpawn_f(1);
+			gameLocal.Printf("build: spawn marine");
+			break;
+		}
+		else if (75 < randx < 95) {
+			//Cmd_EnemySpawn_f(2);
+			gameLocal.Printf("build: spawn shield");
+			break;
+		}
+		else {
+			//Cmd_EnemySpawn_f(3);
+			gameLocal.Printf("build: spawn flyer");
+			break;
+		}
+		break;
+
+	case 2:
+
+		//Sustain Assault Wave
+		if (randx < 50) {
+			Cmd_EnemySpawn_f(1);
+			gameLocal.Printf("sustain: spawn marine");
+			break;
+		}
+		else if (50 < randx < 60) {
+			Cmd_EnemySpawn_f(2);
+			gameLocal.Printf("sustain: spawn shield");
+			break;
+		}
+		else if (70 < randx < 80) {
+			Cmd_EnemySpawn_f(3);
+			gameLocal.Printf("sustain: spawn flyer");
+			break;
+		}
+		else if (80 < randx < 90) {
+			Cmd_EnemySpawn_f(4);
+			gameLocal.Printf("sustain: spawn buff");
+			break;
+		}
+		else if (90 < randx < 95)
+		{
+			Cmd_EnemySpawn_f(5);
+			gameLocal.Printf("sustain: spawn revive");
+			break;
+		}
+		else
+			gameLocal.Printf("sustain: spawn tank");
+		break;
+	default:
+		return;
+	}
+}
+
+/*
+===================
+Cmd_EnemySpawn_f
+===================
+*/
+void Cmd_EnemySpawn_f(int enemy) {
+#ifndef _MPBETA
+	const char* key, * value;
+	int			i;
+	float		yaw;
+	idVec3		org;
+	idPlayer* player;
+	idDict		dict;
+
+	player = gameLocal.GetLocalPlayer();
+
+	yaw = player->viewAngles.yaw;
+	value = "monster_strogg_marine";
+
+	switch (enemy)
+	{
+		case(1):
+			value = "monster_strogg_marine";
+			break;
+		case(2):
+			value = "monster_strogg_grunt";
+			break;
+		case(3):
+			value = "monster_strogg_berserker";
+			break;
+		case(4):
+			value = "monster_strogg_network_guardian";
+			break;
+		case(5):
+			value = "monster_strogg_marine_mgun";
+			break;
+		default:
+			break;
+	}
+	dict.Set("classname", value);
+	dict.Set("angle", va("%f", yaw + 180));
+
+	org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(0, 0, 1);
+	dict.Set("origin", org.ToString());
+
+	/*
+	for (i = 2; i < args.Argc() - 1; i += 2) {
+
+		key = args.Argv(i);
+		value = args.Argv(i + 1);
+
+		dict.Set(key, value);
+	}
+	*/
+
+	// RAVEN BEGIN
+	// kfuller: want to know the name of the entity I spawned
+	idEntity* newEnt = NULL;
+	gameLocal.SpawnEntityDef(dict, &newEnt);
+
+	if (newEnt) {
+		gameLocal.Printf("spawned entity '%s'\n", newEnt->name.c_str());
+	}
+	// RAVEN END
+#endif // !_MPBETA
 }
 
 /*
@@ -3092,6 +3264,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "undying",				Cmd_Undying_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"enables undying mode (take damage down to 1 health, but do not die)" );
 	cmdSystem->AddCommand( "notarget",				Cmd_Notarget_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"disables the player as a target" );
 	cmdSystem->AddCommand( "noclip",				Cmd_Noclip_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"disables collision detection for the player" );
+
 	cmdSystem->AddCommand( "kill",					Cmd_Kill_f,					CMD_FL_GAME,				"kills the player" );
 	cmdSystem->AddCommand( "where",					Cmd_GetViewpos_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"prints the current view position" );
 	cmdSystem->AddCommand( "getviewpos",			Cmd_GetViewpos_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"prints the current view position" );
@@ -3112,7 +3285,12 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "playerModel",			Cmd_PlayerModel_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"sets the given model on the player", idCmdSystem::ArgCompletion_Decl<DECL_MODELDEF> );
 	cmdSystem->AddCommand( "flashlight",			Cmd_Flashlight_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"toggle actor's flashlight", idGameLocal::ArgCompletion_AIName );
 	
+	//cmdSystem->AddCommand("EnemySpawn",				Cmd_EnemySpawn_f,			CMD_FL_GAME,				"spawns enemy using specific function");
+	
 	cmdSystem->AddCommand( "shuffleTeams",			Cmd_ShuffleTeams_f,			CMD_FL_GAME,				"shuffle teams" );
+
+	cmdSystem->AddCommand("startassault", BeginAssaultWave, CMD_FL_GAME, "Tells game to begin the Assault");
+
 // RAVEN BEGIN
 // bdube: not using id effect system
 //	cmdSystem->AddCommand( "testFx",				Cmd_TestFx_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"tests an FX system", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
