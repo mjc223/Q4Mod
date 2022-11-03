@@ -4294,6 +4294,7 @@ float idPlayer::PowerUpModifier( int type ) {
 	float mod = 1.0f;
 
 	if ( PowerUpActive( POWERUP_QUADDAMAGE ) ) {
+		/*
 		switch( type ) {
 			case PMOD_PROJECTILE_DAMAGE: {
 				mod *= 3.0f;
@@ -4307,10 +4308,13 @@ float idPlayer::PowerUpModifier( int type ) {
 				mod *= 2.0f;
 				break;
 			}
-		}
+		}*/
+
+
 	}
 
 	if ( PowerUpActive( POWERUP_HASTE ) ) {
+		/*
 		switch ( type ) {
 			case PMOD_SPEED:	
 				mod *= 1.3f;
@@ -4320,19 +4324,23 @@ float idPlayer::PowerUpModifier( int type ) {
 				mod *= 0.7f;
 				break;
 		}
+		*/
 	}
 
 	// Arena CTF powerups
 	if( PowerUpActive( POWERUP_AMMOREGEN ) ) {
+		/*
 		switch( type ) {
 			case PMOD_FIRERATE: {
 				mod *= 0.7f;
 				break;
 			}
 		}
+		*/
 	}
 
 	if( PowerUpActive( POWERUP_DOUBLER ) ) {
+		/*
 		switch( type ) {
 			case PMOD_PROJECTILE_DAMAGE: {
 				mod *= 2.0f;
@@ -4343,6 +4351,7 @@ float idPlayer::PowerUpModifier( int type ) {
 				break;
 			}
 		}
+		*/
 	}
 
 //RITUAL BEGIN
@@ -4419,17 +4428,17 @@ void idPlayer::StartPowerUpEffect( int powerup ) {
 			break;
 		}
 		case POWERUP_QUADDAMAGE: {
-			powerUpOverlay = quadOverlay;
+			//powerUpOverlay = quadOverlay;
 
 			StopEffect( "fx_regeneration" );
 			PlayEffect( "fx_quaddamage", animator.GetJointHandle( "chest" ), true );			
 			StartSound( "snd_quaddamage_idle", SND_CHANNEL_POWERUP_IDLE, 0, false, NULL );
 
 			// Spawn quad effect
-			powerupEffect = gameLocal.GetEffect( spawnArgs, "fx_quaddamage_crawl" );
-			powerupEffectTime = gameLocal.time;
-			powerupEffectType = POWERUP_QUADDAMAGE;
-
+			//powerupEffect = gameLocal.GetEffect( spawnArgs, "fx_quaddamage_crawl" );
+			//powerupEffectTime = gameLocal.time;
+			//powerupEffectType = POWERUP_QUADDAMAGE;
+			TimedDoor();
 			break;
 		}
 

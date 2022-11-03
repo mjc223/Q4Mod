@@ -3466,6 +3466,7 @@ idGameLocal::RunFrame
 	const renderView_t *view;
 
 	ReviewAssaultWave();
+	ReviewObjectives();
 
 	editors = activeEditors;
 	isLastPredictFrame = lastCatchupFrame;

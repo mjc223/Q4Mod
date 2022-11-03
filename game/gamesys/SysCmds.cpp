@@ -35,8 +35,10 @@ idPlayer* player = gameLocal.GetLocalPlayer();
 int prevArmorCooldown = 0;
 int enemyCount = 0;
 int assaultWaveStart = 0;
-bool waveInProgress = false;
+int doorTimer = 0;
 
+bool waveInProgress = false;
+bool doorInProgress = false;
 /*
 ==================
 Cmd_GetFloatArg
@@ -732,6 +734,26 @@ void Cmd_EnemySpawn_f(int enemy) {
 	}
 	// RAVEN END
 #endif // !_MPBETA
+}
+
+void TimedDoor()
+{
+	doorTimer = gameLocal.time;
+	doorInProgress = true;
+}
+
+void ReviewObjectives()
+{
+	if (doorInProgress)
+	{
+		int temp = gameLocal.time - doorTimer;
+
+		if (temp >= 15000)
+		{
+			gameLocal.Printf("Timer complete!!! \n \n");
+			doorInProgress = false;
+		}
+	}
 }
 
 /*

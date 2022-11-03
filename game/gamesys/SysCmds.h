@@ -23,4 +23,8 @@ int ReturnEnemyCount();
 
 void Help(const idCmdArgs& args);
 
+void ReviewObjectives();
+
+void TimedDoor();
+
 #endif /* !__SYS_CMDS_H__ */
