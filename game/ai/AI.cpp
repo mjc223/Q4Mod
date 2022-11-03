@@ -3588,7 +3588,7 @@ idAI::Prethink
 ============
 */
 void idAI::Prethink ( void ) {
-	ReviewAssaultWave();
+//	ReviewAssaultWave();
 	// Update our helper if we are moving
 	if ( move.fl.moving ) {
 		UpdateHelper ( );

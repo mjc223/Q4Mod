@@ -3465,6 +3465,8 @@ idGameLocal::RunFrame
 	idPlayer	*player;
 	const renderView_t *view;
 
+	ReviewAssaultWave();
+
 	editors = activeEditors;
 	isLastPredictFrame = lastCatchupFrame;
 

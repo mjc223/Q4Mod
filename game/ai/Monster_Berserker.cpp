@@ -194,10 +194,12 @@ bool rvMonsterBerserker::CheckActions ( void ) {
 		return true;
 	}
 
+	/*
 	// Charge attack is where the berserker will charge up his spike and slam it in to the ground
 	if ( PerformAction ( &actionChargeAttack, (checkAction_t)&rvMonsterBerserker::CheckAction_ChargeAttack, &actionTimerSpecialAttack ) ) {
 		return true;
 	}
+	*/
 
 	if ( CheckPainActions ( ) ) {
 		return true;
@@ -225,13 +227,15 @@ bool rvMonsterBerserker::CheckActions ( void ) {
 				}
 				else if ( standingMeleeNoAttackTime + 2500 < gameLocal.GetTime() )
 				{//we've been standing still and not attacking for at least 2.5 seconds, fall back to ranged attack
-					actionRangedAttack.fl.disabled = false;
+					actionRangedAttack.fl.disabled = true;
 				}
 			}
 		}
+		/*
 		if ( PerformAction ( &actionRangedAttack,(checkAction_t)&rvMonsterBerserker::CheckAction_RangedAttack, &actionTimerRangedAttack ) ) {
 			return true;
 		}
+		*/
 	}
 	return false;
 }

@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include "../Game_local.h"
+#include "../gamesys/SysCmds.h"
 
 class rvMonsterScientist : public idAI {
 public:
@@ -50,7 +51,7 @@ rvMonsterScientist::OnDeath
 */
 void rvMonsterScientist::OnDeath ( void ) {
 	StopEffect ( "fx_fly" );
-	
+	Cmd_EnemySpawn_f(6);
 	idAI::OnDeath ( );
 }
 

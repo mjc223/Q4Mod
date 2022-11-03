@@ -126,12 +126,16 @@ void rvMonsterGladiator::Spawn ( void ) {
 	actionRailgunAttack.Init	( spawnArgs, "action_railgunAttack",	"Torso_RailgunAttack",	 AIACTIONF_ATTACK );	
 
 	// Disable range attack until using shield	
-	//actionRangedAttack.fl.disabled = true;
+	actionRangedAttack.fl.disabled = true;
 	const char  *func;
 	if ( spawnArgs.GetString( "script_postWeaponDestroyed", "", &func ) ) 
 	{
 		mPostWeaponDestroyed.Init( func );
 	}
+
+	PerformAction("Torso_ShieldStart", 4, true);
+	DestroyRailgun();
+	ShowShield();
 }
 
 /*
@@ -176,6 +180,8 @@ bool rvMonsterGladiator::CheckActions ( void ) {
 				}
 			}
 		}
+
+		/*
 		// Only ranged attack and melee attack are available when using shield
 		if ( PerformAction ( &actionMeleeAttack, (checkAction_t)&idAI::CheckAction_MeleeAttack )							    ||
 			 PerformAction ( &actionRangedAttack, (checkAction_t)&idAI::CheckAction_RangedAttack, &actionTimerRangedAttack )   ||
@@ -187,21 +193,9 @@ bool rvMonsterGladiator::CheckActions ( void ) {
 				&& PerformAction ( &actionRailgunAttack, (checkAction_t)&idAI::CheckAction_RangedAttack, &actionTimerSpecialAttack ) ) ) {
 			shieldWaitTime = 0;
 			return true;
-		}
+		}		
+		*/
 
-		// see if it's safe to lower it?
-		if ( gameLocal.GetTime() - shieldStartTime > 2000 )
-		{//shield's been up for at least 2 seconds
-			if ( !enemy.fl.visible || (gameLocal.time - combat.shotAtTime > 1000 && gameLocal.GetTime() - shieldLastHitTime > 1500) )
-			{
-				if ( gameLocal.time - pain.lastTakenTime > 1500 )
-				{
-					PerformAction ( "Torso_ShieldEnd", 4, true );
-					return true;
-				}
-			}
-		}
-		
 		return false;
 	}
 	else
@@ -225,9 +219,12 @@ bool rvMonsterGladiator::CheckActions ( void ) {
 				}
 			}
 		}
+		/*
 		if ( railgunHealth > 0 && PerformAction ( &actionRailgunAttack, (checkAction_t)&idAI::CheckAction_RangedAttack, &actionTimerSpecialAttack ) ) {
+			actionRangedAttack.fl.disabled = true;
 			return true;
 		}
+		*/
 	}
 	
 	return idAI::CheckActions ( );
@@ -272,7 +269,7 @@ void rvMonsterGladiator::ShowShield	( void ) {
 	shieldWaitTime					= 0;
 	animPrefix						= "shield";
 	shieldStartTime					= gameLocal.time;
-//	actionRangedAttack.fl.disabled	= false;
+	actionRangedAttack.fl.disabled = true;
 	shieldHealth					= 250;
 	shieldConsecutiveHits			= 0;
 	shieldLastHitTime				= 0;
@@ -308,7 +305,7 @@ void rvMonsterGladiator::HideShield ( int hideTime ) {
 	// Looping shield sound
 	StopSound ( SND_CHANNEL_ITEM, false );
 
-	shield->Hide ( );
+	//shield->Hide ( );
 }
 
 /*
@@ -352,16 +349,17 @@ void rvMonsterGladiator::DestroyRailgun ( void ) {
 	actionMeleeAttack.failRate = 200;
 	actionMeleeAttack.chance = 1.0f;
 
-	actionRangedAttack.chance = 0.25f;
-	actionRangedAttack.maxRange = 400;
-	minShots = 5;
-	maxShots = 15;
+	actionRangedAttack.chance = 0.01f;
+	actionRangedAttack.maxRange = 1;
+	actionRangedAttack.fl.disabled = true;
+	minShots = 0;
+	maxShots = 0;
 
 	combat.tacticalMaskAvailable &= ~AITACTICAL_HIDE_BIT;
 
 	//temporarily disable this so we can charge and get mad
 	//FIXME: force MELEE
-	actionRangedAttack.timer.Add( 6000 );
+	actionRangedAttack.timer.Add( 1570000 );
 	actionTimerRangedAttack.Add( 6000 );
 	actionMeleeAttack.timer.Reset( actionTime );
 

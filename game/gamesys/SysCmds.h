@@ -6,6 +6,7 @@ void D_DrawDebugLines( void );
 
 void KillEntities( const idCmdArgs &args, const idTypeInfo &superClass );
 
+
 void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value );
 
 void GrantArmorOnKill();
@@ -19,5 +20,7 @@ void SpawnEnemies(int phase);
 void Cmd_EnemySpawn_f(int enemy);
 
 int ReturnEnemyCount();
+
+void Help(const idCmdArgs& args);
 
 #endif /* !__SYS_CMDS_H__ */

@@ -23,6 +23,7 @@ public:
 
 protected:
 
+	int					armor;
 	int					shots;
 	int					shotsFired;
 	idStr				nailgunPrefix;
@@ -79,6 +80,7 @@ void rvMonsterGunner::InitSpawnArgsVariables( void )
 	nailgunMaxShots = spawnArgs.GetInt ( "action_nailgunAttack_maxshots", "20" );
 	attackRate = SEC2MS( spawnArgs.GetFloat( "attackRate", "0.3" ) );
 	attackJoint = animator.GetJointHandle( spawnArgs.GetString( "attackJoint", "muzzle" ) );
+	armor = 50;
 }
 /*
 ================
@@ -91,7 +93,7 @@ void rvMonsterGunner::Spawn ( void ) {
 	actionSideStepLeft.Init ( spawnArgs, "action_sideStepLeft", NULL, 0 );
 	actionSideStepRight.Init ( spawnArgs, "action_sideStepRight", NULL, 0 );
 	actionTimerSideStep.Init ( spawnArgs, "actionTimer_sideStep" );
-	
+	armor = 50;
 	InitSpawnArgsVariables();
 }
 
@@ -306,6 +308,12 @@ void rvMonsterGunner::GetDebugInfo ( debugInfoProc_t proc, void* userData ) {
 }
 
 bool rvMonsterGunner::Pain( idEntity *inflictor, idEntity *attacker, int damage, const idVec3 &dir, int location ) {
+	if (armor > 0)
+	{
+		gameLocal.Printf("armor activated");
+		armor -= damage;
+		damage = 0;
+	}
 	actionTimerRangedAttack.Clear( actionTime );
 	actionNailgunAttack.timer.Clear( actionTime );
 	return (idAI::Pain( inflictor, attacker, damage, dir, location ));

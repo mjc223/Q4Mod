@@ -544,7 +544,6 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 
 void GrantArmorOnKill()
 {
-	//TODO: Implement cooldown
 	player = gameLocal.GetLocalPlayer();
 	int temp = gameLocal.time - prevArmorCooldown;
 	if (temp > 5000) //5 second cooldown on the player receiving armor from a kill
@@ -573,25 +572,25 @@ void ReviewAssaultWave()
 
 	
 	int temp = gameLocal.time - assaultWaveStart;
-	if (temp < 450000)
+	if (temp < 150000)
 	{
-		if (temp % 4000 == 0)
+		if (temp % 3000 == 0)
 		{
 			SpawnEnemies(1);
 			enemyCount++;
 			return;
 		}
 	}
-	else if (temp < 195000)
+	else if (15000 < temp < 30000)
 	{
-		if (temp % 2000 == 0)
+		if (temp % 5000 == 0)
 		{
 			SpawnEnemies(2);
 			enemyCount++;
 			return;
 		}
 	}
-	else if (temp >= 215000)
+	else if (temp >= 45000)
 	{
 		assaultWaveStart = gameLocal.time;
 		return;
@@ -604,64 +603,64 @@ void SpawnEnemies(int phase)
 {
 	int randx = gameLocal.random.RandomInt(100);
 
-	switch (phase) {
 
-	case 1:
+	if (phase == 1)
+	{
 		//Build Assault Wave
 		if (randx < 75) {
-			//Cmd_EnemySpawn_f(1);
+			Cmd_EnemySpawn_f(1);
 			gameLocal.Printf("build: spawn marine");
-			break;
 		}
 		else if (75 < randx < 95) {
-			//Cmd_EnemySpawn_f(2);
+			Cmd_EnemySpawn_f(2);
 			gameLocal.Printf("build: spawn shield");
-			break;
 		}
 		else {
-			//Cmd_EnemySpawn_f(3);
+			Cmd_EnemySpawn_f(3);
 			gameLocal.Printf("build: spawn flyer");
-			break;
 		}
-		break;
-
-	case 2:
-
+	}
+	else if (phase == 2)
+	{
 		//Sustain Assault Wave
 		if (randx < 50) {
 			Cmd_EnemySpawn_f(1);
 			gameLocal.Printf("sustain: spawn marine");
-			break;
 		}
 		else if (50 < randx < 60) {
 			Cmd_EnemySpawn_f(2);
 			gameLocal.Printf("sustain: spawn shield");
-			break;
 		}
 		else if (70 < randx < 80) {
 			Cmd_EnemySpawn_f(3);
 			gameLocal.Printf("sustain: spawn flyer");
-			break;
 		}
 		else if (80 < randx < 90) {
 			Cmd_EnemySpawn_f(4);
 			gameLocal.Printf("sustain: spawn buff");
-			break;
 		}
 		else if (90 < randx < 95)
 		{
 			Cmd_EnemySpawn_f(5);
 			gameLocal.Printf("sustain: spawn revive");
-			break;
 		}
 		else
 			gameLocal.Printf("sustain: spawn tank");
-		break;
-	default:
-		return;
 	}
+		return;
 }
 
+
+void Help(const idCmdArgs& args)
+{
+	gameLocal.Printf("Welcome to HordeQuake. \n\n");
+	gameLocal.Printf("Weapons: \n\n Various weapon changes have been made for balance.\n The assault rifle fires faster, is more accurate but holds less ammo.\n The grenade launcher will instantly kill most enemies but has pitiful ammo capacity.\n\n");
+	gameLocal.Printf("Waves: \n\n Enemies spawn in waves. Waves are comprised of Build, Sustain, Fade.\n Less enemies spawn in during the build phase, more enemies and more varied enemies spawn in during sustain. None spawn during fade.\n\n");
+	gameLocal.Printf("Monsters: \n\n no monster mods lmao \n\n");
+	gameLocal.Printf("Armor: \n\n Armor blocks 100% of damage, damage higher than your armor is fully regenerated.\n You can regenerate armor on kill every 5 seconds. \n\n");
+	gameLocal.Printf("Objectives: \n\n This doesn't work. \n\n");
+
+}
 /*
 ===================
 Cmd_EnemySpawn_f
@@ -687,24 +686,30 @@ void Cmd_EnemySpawn_f(int enemy) {
 			value = "monster_strogg_marine";
 			break;
 		case(2):
-			value = "monster_strogg_grunt";
+			value = "monster_grunt";
 			break;
 		case(3):
-			value = "monster_strogg_berserker";
+			value = "monster_berserker";
 			break;
 		case(4):
-			value = "monster_strogg_network_guardian";
+			value = "monster_scientist";
 			break;
 		case(5):
-			value = "monster_strogg_marine_mgun";
+			value = "monster_gunner";
+			break;
+		case(6):
+			value = "monster_scientist";
 			break;
 		default:
 			break;
 	}
+	if (enemy == 6 && gameLocal.time % 3 != 0)
+		return;
+
 	dict.Set("classname", value);
 	dict.Set("angle", va("%f", yaw + 180));
-
-	org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(0, 0, 1);
+	
+	org = player->GetPhysics()->GetOrigin() + idAngles(0, yaw, 0).ToForward() * 80 + idVec3(5, 0, 5);
 	dict.Set("origin", org.ToString());
 
 	/*
@@ -3288,8 +3293,9 @@ void idGameLocal::InitConsoleCommands( void ) {
 	//cmdSystem->AddCommand("EnemySpawn",				Cmd_EnemySpawn_f,			CMD_FL_GAME,				"spawns enemy using specific function");
 	
 	cmdSystem->AddCommand( "shuffleTeams",			Cmd_ShuffleTeams_f,			CMD_FL_GAME,				"shuffle teams" );
-
+	cmdSystem->AddCommand("modhelp",					Help,						CMD_FL_GAME,				"Gives the player help");
 	cmdSystem->AddCommand("startassault", BeginAssaultWave, CMD_FL_GAME, "Tells game to begin the Assault");
+	
 
 // RAVEN BEGIN
 // bdube: not using id effect system
